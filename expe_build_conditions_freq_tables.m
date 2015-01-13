@@ -169,8 +169,8 @@ tables = {'greenwood','lin','ci24','hr90k'};
 
 for i_freq_table = 1:length(tables) %loop on the type of frequency tables
     
-    for nc = [4, 8, 16, 22]
-        for shift = [0, 2, 5]  %shift = [0, 2, 4, 6] % Based on Skinner et al., 2002, JARO
+    for nc = 16 %run for 16 chs only
+        for shift = [0, 5]  %shift = [0, 2, 4, 6] % Based on Skinner et al., 2002, JARO
 
             p.analysis_filters  = filter_bands([150, 7000], nc, options.fs, tables{i_freq_table}, vo, 0);
             p.synthesis_filters = filter_bands([150, 7000], nc, options.fs, tables{1}, vo, shift);
