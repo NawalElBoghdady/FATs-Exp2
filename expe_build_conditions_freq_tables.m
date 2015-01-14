@@ -44,7 +44,7 @@ options.training.n_repeat = 1;
 options.training.step_size_modifier = 1/sqrt(2);
 options.training.change_step_size_condition = 2; % When difference <= this, decrease step-size
 options.training.change_step_size_n_trials = 15; % Change step-size every...
-options.training.initial_step_size  = 4; % Semitones
+options.training.initial_step_size  = 8; % Semitones: initially 4, set to 8.
 options.training.starting_difference = 12; % Semitones
 options.training.down_up = [2, 1]; % 2-down, 1-up => 70.7%
 options.training.terminate_on_nturns = 6;

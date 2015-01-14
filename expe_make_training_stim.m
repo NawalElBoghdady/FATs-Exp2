@@ -1,4 +1,4 @@
-function [xOut, fs, i_correct] = expe_make_stim(options, trial)
+function [xOut, fs, i_correct] = expe_make_training_stim(options, trial)
 
 %--------------------------------------------------------------------------
 % Etienne Gaudrain <etienne.gaudrain@mrc-cbu.cam.ac.uk>

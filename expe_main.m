@@ -1,5 +1,7 @@
 function expe_main(options, phase)
 
+%GUI
+
 %--------------------------------------------------------------------------
 % Etienne Gaudrain <e.p.c.gaudrain@umcg.nl> - 2013-02-24
 % RuG / UMCG KNO, Groningen, NL
@@ -10,6 +12,7 @@ load(options.res_filename); % options, expe, results
 
 h = expe_gui(options);
 h.hide_instruction();
+h.hide_training_instruction();
 h.set_progress(strrep(phase, '_', ' '), 0, 0);
 h.set_sylls({'1', '2', '3'});
 h.disable_buttons();
@@ -38,6 +41,7 @@ beginning_of_session = now();
 
 while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are some conditions to do
     
+    
     % If we start, display a message
 
     instr = strrep(options.instructions.(phase), '\n', sprintf('\n'));
@@ -57,6 +61,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
         msg.w = figure('Visible', 'off', 'Position', [left+(width-msgw)/2, (height-msgh)/2, msgw, msgh], 'Menubar', 'none', 'Resize', 'off', 'Color', [1 1 1]*.9, 'Name', 'Instructions');
 
         msg.txt = uicontrol('Style', 'text', 'Position', [mr, 50+mr*2, msgw-mr*2, msgh-(50+mr)-mr*2], 'Fontsize', 18, 'HorizontalAlignment', 'left', 'BackgroundColor', [1 1 1]*.9);
+        
         instr = textwrap(msg.txt, {instr});
         set(msg.txt, 'String', instr);
         msg.bt = uicontrol('Style', 'pushbutton', 'Position', [msgw/2-50, mr, 100, 50], 'String', 'OK', 'Fontsize', 14, 'Callback', 'uiresume');
@@ -73,6 +78,23 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             break
     end
 
+    %% Training on the vocoder:
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Insert Vocoder Training Sentences here!!!!
+    prompt = char(questdlg2(sprintf('You will now hear examples of a reference word followed by a processed version to accustom you to the differences.'),...
+        h,'OK','OK'));
+    
+    h.show_training_instruction();
+    h.set_training_instruction(sprintf('TOP: Reference, BOTTOM: Target'));
+    
+    
+    
+    h.hide_training_instruction();
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    %%
+    
     starting = 0;
     
     % Prepare the GUI

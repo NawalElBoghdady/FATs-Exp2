@@ -50,6 +50,9 @@ h.grid = axes('Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid
 h.instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+10, grid_sz(1), 50], ...
     'HorizontalAlignment', 'center', 'FontSize', fntsz, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
 
+h.training_instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+10, grid_sz(1), 50], ...
+    'HorizontalAlignment', 'center', 'FontSize', fntsz, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
+
 % Margin
 m = .1;
 
@@ -89,6 +92,13 @@ h.patch_click = @CB_patch_click;
 h.highlight_button = @(i, s) highlight_button(h, i, s);
 h.disable_buttons = @() switch_buttons(h, 'off');
 h.enable_buttons = @() switch_buttons(h, 'on');
+
+%---Training Actions:
+
+h.hide_training_instruction = @() set(h.training_instruction, 'Visible', 'off');
+h.show_training_instruction = @() set(h.training_instruction, 'Visible', 'on');
+h.set_training_instruction = @(t) set(h.training_instruction, 'String', t);
+
 
 %-------- Events
 set(h.f, 'WindowButtonUpFcn', {@CB_reset_colors, h});
