@@ -35,17 +35,18 @@ SIMUL = 0;
 
 test_machine = is_test_machine();
 
+opt = char(questdlg2(sprintf('Ready to start?'),h,'Go','Cancel','Go'));
+    switch lower(opt)
+        case 'cancel'
+            return
+    end
+
 beginning_of_session = now();
 
 %=============================================================== MAIN LOOP
 
 while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are some conditions to do
     
-    opt = char(questdlg2(sprintf('Ready to start?'),h,'Go','Cancel','Go'));
-    switch lower(opt)
-        case 'cancel'
-            break
-    end
     
   %%%HERE!
     
@@ -156,6 +157,11 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %%
+    opt = char(questdlg2(sprintf('Continue to actual test?'),h,'Yes','No','Yes'));
+    switch opt
+        case 'No'
+            break
+    end
     % If we start the actual testing phase, display a message
 
     instr = strrep(options.instructions.(phase), '\n', sprintf('\n'));
@@ -547,6 +553,11 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     pause(1);
     %starting = true;
     
+    opt = char(questdlg2(sprintf('Would you like to continue testing or take a break?'),h,'Continue','Take a Break','Continue'));
+    switch opt
+        case 'Take a Break'
+            break
+    end
 end
 
 % If we're out of the loop because the phase is finished, tell the subject
