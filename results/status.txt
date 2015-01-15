@@ -1,1 +1,1 @@
-test-bla : test : 2/48
+nanu-test : test : 4/32

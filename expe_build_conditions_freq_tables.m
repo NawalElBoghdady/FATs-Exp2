@@ -32,7 +32,7 @@ options.test.n_repeat = 2; % Number of repetition per condition
 options.test.step_size_modifier = 1/sqrt(2);
 options.test.change_step_size_condition = 2; % When difference leq than this times step-size, decrease step-size
 options.test.change_step_size_n_trials = 15; % Change step-size every...
-options.test.initial_step_size  = 2; % Semitones
+options.test.initial_step_size  = 8;%2; % Semitones.
 options.test.starting_difference = 12; % Semitones
 options.test.down_up = [2, 1]; % 2-down, 1-up => 70.7%
 options.test.terminate_on_nturns = 8;
@@ -44,7 +44,7 @@ options.training.n_repeat = 1;
 options.training.step_size_modifier = 1/sqrt(2);
 options.training.change_step_size_condition = 2; % When difference <= this, decrease step-size
 options.training.change_step_size_n_trials = 15; % Change step-size every...
-options.training.initial_step_size  = 8; % Semitones: initially 4, set to 8.
+options.training.initial_step_size  = 4; % Semitones.
 options.training.starting_difference = 12; % Semitones
 options.training.down_up = [2, 1]; % 2-down, 1-up => 70.7%
 options.training.terminate_on_nturns = 6;
@@ -96,23 +96,32 @@ options.test.voice_pairs = [...
 %    1 6;  % Female -> Child GPR
     1 7]; % Female -> Child VTL
 options.training.voice_pairs = [...
-    1 5;  % Female -> Male
-    1 7]; % Female -> Child
+    1 5;  % Female -> Male VTL
+    1 7]; % Female -> Child VTL
 
 if ~test_machine %If it's computer in Stille Kamer
     options.sound_path = '~/projects/00 stimuli/Dutch_CV/equalized';
     options.tmp_path   = '~/projects/00 stimuli/Dutch_CV/processed';
+    options.training_words = '~/projects/00 stimuli/NVA/equalized';
+    options.training_words_tmp   = '~/projects/00 stimuli/NVA/processed';
+    
 else %If it's experimenter's OWN computer:
     disp('-------------------------');
     disp('--- On coding machine ---');
     disp('-------------------------');
     options.sound_path = '~/Library/Matlab/Sounds/Dutch_CV/equalized';
     options.tmp_path   = '~/Library/Matlab/Sounds/Dutch_CV/processed';
+    options.training_words = '~/Library/Matlab/Sounds/NVA/equalized';
+    options.training_words_tmp   = '~/Library/Matlab/Sounds/NVA/processed';
 end
 
 if ~exist(options.tmp_path, 'dir')
     mkdir(options.tmp_path);
-end 
+end
+
+if ~exist(options.training_words_tmp, 'dir')
+    mkdir(options.training_words_tmp);
+end
 
 dir_waves = dir([options.sound_path, '/*.wav']);
 syllable_list = {dir_waves.name};
@@ -120,16 +129,29 @@ for i= 1:length(syllable_list)
     syllable_list{i} = strrep(syllable_list{i}, '.wav', '');
 end
 
+dir_words = dir([options.training_words, '/*.wav']);
+word_list = {dir_words.name};
+for i= 1:length(word_list)
+    word_list{i} = strrep(word_list{i}, '.wav', '');
+end
+
 options.syllables = syllable_list;
 options.n_syll = 3;
 
+options.words = word_list;
+options.n_words = 1;
+
 options.inter_syllable_silence = 50e-3;
 options.syllable_duration = 200e-3;
+
+options.word_duration = 500e-3;
 
 options.f0_contour_step_size = 1/3; % semitones
 options.f0_contours = [[-1 0 +1]; [+1 0 -1]; [-1 1 -1]+1/3; [1 -1 1]-1/3; [-1 -1 1]+1/3; [1 1 -1]-1/3; [-1 1 1]-1/3; [1 -1 -1]+1/3];
 
 options.inter_triplet_interval = 250e-3;
+
+options.inter_word_interval = 250e-3;
 
 options.force_rebuild_sylls = 0;
 

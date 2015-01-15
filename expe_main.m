@@ -41,67 +41,13 @@ beginning_of_session = now();
 
 while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are some conditions to do
     
-    
-    % If we start, display a message
-
-    instr = strrep(options.instructions.(phase), '\n', sprintf('\n'));
-    if ~isempty(instr) && starting
-        scrsz = get(0,'ScreenSize');
-        if ~test_machine
-            left=scrsz(1); bottom=scrsz(2); width=scrsz(3); height=scrsz(4);
-        else
-            left = -1024; bottom=0; width=1024; height=768;
-        end
-        scrsz = [left, bottom, width, height];
-
-        msg = struct();
-        msgw = 900;
-        msgh = 650;
-        mr = 60;
-        msg.w = figure('Visible', 'off', 'Position', [left+(width-msgw)/2, (height-msgh)/2, msgw, msgh], 'Menubar', 'none', 'Resize', 'off', 'Color', [1 1 1]*.9, 'Name', 'Instructions');
-
-        msg.txt = uicontrol('Style', 'text', 'Position', [mr, 50+mr*2, msgw-mr*2, msgh-(50+mr)-mr*2], 'Fontsize', 18, 'HorizontalAlignment', 'left', 'BackgroundColor', [1 1 1]*.9);
-        
-        instr = textwrap(msg.txt, {instr});
-        set(msg.txt, 'String', instr);
-        msg.bt = uicontrol('Style', 'pushbutton', 'Position', [msgw/2-50, mr, 100, 50], 'String', 'OK', 'Fontsize', 14, 'Callback', 'uiresume');
-        set(msg.w, 'Visible', 'on');
-        uicontrol(msg.bt);
-
-        uiwait(msg.w);
-        close(msg.w);
-    end
-
     opt = char(questdlg2(sprintf('Ready to start?'),h,'Go','Cancel','Go'));
     switch lower(opt)
         case 'cancel'
             break
     end
-
-    %% Training on the vocoder:
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %Insert Vocoder Training Sentences here!!!!
-    prompt = char(questdlg2(sprintf('You will now hear examples of a reference word followed by a processed version to accustom you to the differences.'),...
-        h,'OK','OK'));
-    
-    h.show_training_instruction();
-    h.set_training_instruction(sprintf('TOP: Reference, BOTTOM: Target'));
-    
-    
-    
-    h.hide_training_instruction();
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    %%
-    
-    starting = 0;
-    
-    % Prepare the GUI
-    h.show_instruction();
-    h.show_buttons();
-    h.set_instruction(sprintf('Which interval is different?'));
-    h.set_progress(strrep(phase, '_', ' '), sum([expe.( phase ).conditions.done])+1, length([expe.( phase ).conditions.done]));
+  %%%HERE!
     
     % Find first condition not done
     i_condition = find([expe.( phase ).conditions.done]==0, 1);
@@ -132,7 +78,122 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     steps = [];
     differences = [difference];
     
+    
+     %% Training on the vocoder:
+    tic
+    h.hide_buttons();
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Insert Vocoder Training Sentences here!!!!
+    prompt = char(questdlg2(sprintf(...
+        'In the experiments you will hear three sounds: two are the same and one is different. Now you will be given a short training in which a word will be shown on the screen, once in BLUE and once in RED. The BLUE version sounds like the 2 identical sounds in the test, while the RED version sounds like the odd sound you should detect.'),...
+        h,'OK','OK'));
+    switch prompt
+        case 'OK'
+            
+            h.show_training_instruction();
+            h.set_training_instruction(sprintf('Listen carefully to the differences between the BLUE and RED words.'));
+            
+    end
+    
+    
+    
+    training = condition;
+    
+    new_voice_st = difference*u;
+    training.f0 = options.test.voices(training.ref_voice).f0 * [1, 2^(new_voice_st(1)/12)];
+    training.ser = options.test.voices(training.ref_voice).ser * [1, 2^(new_voice_st(2)/12)];
+
+    ifc = randperm(size(options.f0_contours, 1)); %%% Why is it an 8-by-3 matrix, where all 3 are different?
+    training.f0_contours = options.f0_contours(ifc(1:3), :);
+    
+    iword = randperm(length(options.words));
+    for i_int=1:5
+        training.words{i_int} = options.words(iword(i_int));
+    end
+    
+    [xOut, fs] = expe_make_training_stim(options, training);
+    
+    player = cell(size(xOut,1),size(xOut,2));
+    
+    for i = 1:size(xOut,2)
+        
+        x = xOut{1,i}*10^(-options.attenuation_dB/20);
+        player{1,i} = audioplayer([zeros(1024*3, 2); x; zeros(1024*3, 2)], fs, 16);
+        
+        x = xOut{2,i}*10^(-options.attenuation_dB/20);
+        player{2,i} = audioplayer([zeros(1024*3, 2); x; zeros(1024*3, 2)], fs, 16);
+    end
+
+    ibi = audioplayer(zeros(floor(.1*fs), 2), fs); %interblock interval
+    iwi = audioplayer(zeros(floor(.05*fs), 2), fs); %interword interval
+
+    pause(.5);
+
+    % Play the stimuli
+    for i = 1:size(xOut,2)
+       
+        %h.highlight_button(i, 'on');
+        disp(training.words{i});
+        disp('=====');
+        h.set_training_word(['REFERENCE:';training.words{i}]);
+        h.show_training_word();
+        h.set_training_word_color([0.2 0.2 1]);
+        playblocking(player{1,i});
+        playblocking(iwi);
+        h.set_training_word(['TARGET:';training.words{i}]);
+        h.set_training_word_color([1 0.2 0.2]);
+        playblocking(player{2,i});
+        h.hide_training_word();
+        %h.highlight_button(i, 'off');
+        
+        if i~=size(xOut,2)
+            playblocking(ibi);
+        end
+    end
+    toc
+    h.hide_training_instruction();
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    %%
+    % If we start the actual testing phase, display a message
+
+    instr = strrep(options.instructions.(phase), '\n', sprintf('\n'));
+    if ~isempty(instr) && starting
+        scrsz = get(0,'ScreenSize');
+        if ~test_machine
+            left=scrsz(1); bottom=scrsz(2); width=scrsz(3); height=scrsz(4);
+        else
+            left = -1024; bottom=0; width=1024; height=768;
+        end
+        scrsz = [left, bottom, width, height];
+
+        msg = struct();
+        msgw = 900;
+        msgh = 650;
+        mr = 60;
+        msg.w = figure('Visible', 'off', 'Position', [left+(width-msgw)/2, (height-msgh)/2, msgw, msgh], 'Menubar', 'none', 'Resize', 'off', 'Color', [1 1 1]*.9, 'Name', 'Instructions');
+
+        msg.txt = uicontrol('Style', 'text', 'Position', [mr, 50+mr*2, msgw-mr*2, msgh-(50+mr)-mr*2], 'Fontsize', 18, 'HorizontalAlignment', 'left', 'BackgroundColor', [1 1 1]*.9);
+        
+        instr = textwrap(msg.txt, {instr});
+        set(msg.txt, 'String', instr);
+        msg.bt = uicontrol('Style', 'pushbutton', 'Position', [msgw/2-50, mr, 100, 50], 'String', 'OK', 'Fontsize', 14, 'Callback', 'uiresume');
+        set(msg.w, 'Visible', 'on');
+        uicontrol(msg.bt);
+
+        uiwait(msg.w);
+        close(msg.w);
+    end
+    
+    starting = 0;
     beginning_of_run = now();
+    
+    % Prepare the GUI
+    h.show_instruction();
+    h.show_buttons();
+    h.set_instruction(sprintf('Which interval is different?'));
+    h.set_progress(strrep(phase, '_', ' '), sum([expe.( phase ).conditions.done])+1, length([expe.( phase ).conditions.done]));
     
     while true
         
@@ -152,7 +213,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
         trial.f0 = options.test.voices(trial.ref_voice).f0 * [1, 2^(new_voice_st(1)/12)];
         trial.ser = options.test.voices(trial.ref_voice).ser * [1, 2^(new_voice_st(2)/12)];
         
-        ifc = randperm(size(options.f0_contours, 1));
+        ifc = randperm(size(options.f0_contours, 1)); %%% Why is it an 8-by-3 matrix, where all 3 are different?
         trial.f0_contours = options.f0_contours(ifc(1:3), :);
         
         isyll = randperm(length(options.syllables));
@@ -160,6 +221,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             %trial.syllables{i_int} = options.syllables(isyll(((i_int-1)*options.n_syll+(1:options.n_syll))));
             trial.syllables{i_int} = options.syllables(isyll(1:options.n_syll));
         end
+        
         
         % Prepare the stimulus
         if SIMUL>=2
@@ -273,7 +335,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             % The last n_down responses were correct -> Reduce
             % difference by step_size, then update step_size
             
-            fprintf('--> Where going down by %f st\n', step_size);
+            fprintf('--> We are going down by %f st\n', step_size);
             
             difference = difference - step_size;
             steps = [steps, -step_size];
@@ -287,7 +349,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             % The last n_up responses were incorrect -> Increase
             % difference by step_size.
             
-            fprintf('--> Where going up by %f st\n', step_size);
+            fprintf('--> We are going up by %f st\n', step_size);
             
             difference = difference + step_size;
             steps = [steps, step_size];
@@ -299,7 +361,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
         else
             % Not going up nor down
             
-            fprintf('--> Where going neither down nor up\n');
+            fprintf('--> We are going neither down nor up\n');
             
             steps = [steps, 0];
             differences = [differences, difference];

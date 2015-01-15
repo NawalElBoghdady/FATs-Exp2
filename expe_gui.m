@@ -51,7 +51,10 @@ h.instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/
     'HorizontalAlignment', 'center', 'FontSize', fntsz, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
 
 h.training_instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+10, grid_sz(1), 50], ...
-    'HorizontalAlignment', 'center', 'FontSize', fntsz, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
+    'HorizontalAlignment', 'center', 'FontSize', 25, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
+
+h.training_word = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2, grid_sz(1), 50], ...
+    'HorizontalAlignment', 'center', 'FontSize', 25, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
 
 % Margin
 m = .1;
@@ -98,6 +101,11 @@ h.enable_buttons = @() switch_buttons(h, 'on');
 h.hide_training_instruction = @() set(h.training_instruction, 'Visible', 'off');
 h.show_training_instruction = @() set(h.training_instruction, 'Visible', 'on');
 h.set_training_instruction = @(t) set(h.training_instruction, 'String', t);
+
+h.set_training_word = @(t) set(h.training_word, 'String', t);
+h.set_training_word_color = @(t) set(h.training_word, 'ForegroundColor', t);
+h.hide_training_word = @() set(h.training_word, 'Visible', 'off');
+h.show_training_word = @() set(h.training_word, 'Visible', 'on');
 
 
 %-------- Events

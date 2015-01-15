@@ -19,19 +19,6 @@ options.subject_name  = subject;
 current_dir = fileparts(mfilename('fullpath'));
 added_path  = {};
 
-%{
-if ~exist('setPA4', 'file')
-    addpath(fullfile(current_dir, 'TDT_dummy'));
-    added_path{end+1} = fullfile(current_dir, 'TDT_dummy');
-    disp('WARNING: TDT-Dummy used instead of TDT.');
-end
-
-if ~exist('pa', 'file')
-    addpath(fullfile(current_dir, 'pa_7'));
-    added_path{end+1} = fullfile(current_dir, 'pa_7');
-end
-%}
-
 added_path{end+1} = '~/Library/Matlab/auditory-research-tools/vocoder_2013';
 addpath(added_path{end});
 
