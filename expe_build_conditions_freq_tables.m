@@ -187,23 +187,35 @@ p.random_seed = 1;
 vi = 1; %vocoder index (how many vocoder instances u are simulating)
 vo = 1; %butterworth filter order fixed to 4th order.
 
+nc = 16; %run for 16 chs only
+elec_array = struct('type','AB-HiFocus','ins_depth',[],'length',25,'e_width',0.4,'e_spacing',1.1,'nchs',16);
+c_length = 33; %33 mm average cochlear length
+
+
 tables = {'greenwood','lin','ci24','hr90k'};
 
-for i_freq_table = 1:length(tables) %loop on the type of frequency tables
+ins_depth = [25, 18];
+
+for i = 1:length(ins_depth)  %shallow = 18mm, %deep insertion = 23mm for HiFocus. %shift = [0, 2, 4, 6] % Based on Skinner et al., 2002, JARO
     
-    for nc = 16 %run for 16 chs only
-        for shift = [0, 5]  %shift = [0, 2, 4, 6] % Based on Skinner et al., 2002, JARO
+    elec_array.ins_depth = ins_depth(i);
+    x = e_loc(elec_array,c_length);
+    
+    bf_SG = spiral_ganglion(x);
+    
+    actual_elecs = length(x); %actual number of electrodes implanted.
+    
+    for i_freq_table = 1:length(tables) %loop on the type of frequency tables 
 
-            p.analysis_filters  = filter_bands([150, 7000], nc, options.fs, tables{i_freq_table}, vo, 0);
-            p.synthesis_filters = filter_bands([150, 7000], nc, options.fs, tables{1}, vo, shift);
+        p.analysis_filters  = estfilt_shift(actual_elecs, tables{i_freq_table}, options.fs, [170 8700], vo);
+        p.synthesis_filters = estfilt_shift(actual_elecs, 'SG', options.fs, bf_SG, vo);
 
-            options.vocoder(vi).label = sprintf('n-%dch-%dord-%dmm', nc, 4*vo, shift);
-            options.vocoder(vi).description = sprintf('Noise-band vocoder, type %d ,%d bands from 150 to 7000 Hz, shift of %d mm, order %d, %d Hz envelope cutoff.',...
-                tables{i_freq_table}, nc, shift, 4*vo, p.envelope.fc);
-            options.vocoder(vi).parameters = p;
+        options.vocoder(vi).label = sprintf('n-%dch-%dord-%dmm', nc, 4*vo, ins_depth);
+        options.vocoder(vi).description = sprintf('Noise-band vocoder, type %d ,%d bands from 150 to 7000 Hz, shift of %d mm, order %d, %d Hz envelope cutoff.',...
+            tables{i_freq_table}, nc, ins_depth, 4*vo, p.envelope.fc);
+        options.vocoder(vi).parameters = p;
 
-            vi = vi +1;
-        end
+        vi = vi +1;
     end
 end
 

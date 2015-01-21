@@ -58,7 +58,14 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     if condition.vocoder==0
         fprintf('No vocoder\n\n');
     else
-        fprintf('Vocoder: %s\n %s\n\n', options.vocoder(condition.vocoder).label, options.vocoder(condition.vocoder).parameters.analysis_filters.type);
+        if condition.dir_voice == 5
+            target = 'male';
+        elseif condition.dir_voice == 7
+            target = 'child';
+        else
+            target = 'other';
+        end
+        fprintf('Vocoder: %s\n %s\n %s\n\n', options.vocoder(condition.vocoder).label, options.vocoder(condition.vocoder).parameters.analysis_filters.type,target);
     end
     
     % Prepare unitary vector for this voice direction
