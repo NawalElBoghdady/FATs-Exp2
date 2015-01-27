@@ -91,7 +91,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     tic
     h.hide_buttons();
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %Insert Vocoder Training Sentences here!!!!
+    %Vocoder Training Sentences
     prompt = char(questdlg2(sprintf(...
         'In the experiments you will hear three sounds: two are the same and one is different. Now you will be given a short training in which a word will be shown on the screen, once in BLUE and once in RED. The BLUE version sounds like the 2 identical sounds in the test, while the RED version sounds like the odd sound you should detect.'),...
         h,'OK','OK'));

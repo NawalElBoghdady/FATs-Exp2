@@ -188,31 +188,30 @@ vi = 1; %vocoder index (how many vocoder instances u are simulating)
 vo = 1; %butterworth filter order fixed to 4th order.
 
 nc = 16; %run for 16 chs only
-elec_array = struct('type','AB-HiFocus','ins_depth',[],'length',25,'e_width',0.4,'e_spacing',1.1,'nchs',16);
+elec_array = struct('type','AB-HiFocus','ins_depth',[],'tot_length',24.5,'e_width',0.4,'e_spacing',1.1,'nchs',16, 'active_length',15.5);
 c_length = 33; %33 mm average cochlear length
 
-
+range = [170 8700];
 tables = {'greenwood','lin','ci24','hr90k'};
 
-ins_depth = [25, 18];
+ins_depth = [21.5, 18.5]; %shallow = 18.5mm, %deep insertion = 21.5mm for HiFocus => data from AB surgeon's guide for HiRes90K implant
 
-for i = 1:length(ins_depth)  %shallow = 18mm, %deep insertion = 23mm for HiFocus. %shift = [0, 2, 4, 6] % Based on Skinner et al., 2002, JARO
+for i = 1:length(ins_depth)  
     
     elec_array.ins_depth = ins_depth(i);
     x = e_loc(elec_array,c_length);
     
     bf_SG = spiral_ganglion(x);
     
-    actual_elecs = length(x); %actual number of electrodes implanted.
     
     for i_freq_table = 1:length(tables) %loop on the type of frequency tables 
 
-        p.analysis_filters  = estfilt_shift(actual_elecs, tables{i_freq_table}, options.fs, [170 8700], vo);
-        p.synthesis_filters = estfilt_shift(actual_elecs, 'SG', options.fs, bf_SG, vo);
+        p.analysis_filters  = estfilt_shift(nc, tables{i_freq_table}, options.fs, range, vo);
+        p.synthesis_filters = estfilt_shift(nc, 'SG', options.fs, bf_SG, vo);
 
-        options.vocoder(vi).label = sprintf('n-%dch-%dord-%dmm', nc, 4*vo, ins_depth);
-        options.vocoder(vi).description = sprintf('Noise-band vocoder, type %d ,%d bands from 150 to 7000 Hz, shift of %d mm, order %d, %d Hz envelope cutoff.',...
-            tables{i_freq_table}, nc, ins_depth, 4*vo, p.envelope.fc);
+        options.vocoder(vi).label = sprintf('n-%dch-%dord-%gmm', nc, 4*vo, ins_depth(i));
+        options.vocoder(vi).description = sprintf('Noise-band vocoder, type %s ,%i bands from %d to %d Hz, insertion depth %g mm, order %i, %i Hz envelope cutoff.',...
+            tables{i_freq_table}, nc, range(1),range(2) ,ins_depth(i), 4*vo, p.envelope.fc);
         options.vocoder(vi).parameters = p;
 
         vi = vi +1;
