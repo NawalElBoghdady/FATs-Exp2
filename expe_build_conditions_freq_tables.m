@@ -32,13 +32,15 @@ options.test.n_repeat = 2; % Number of repetition per condition
 options.test.step_size_modifier = 1/sqrt(2);
 options.test.change_step_size_condition = 2; % When difference leq than this times step-size, decrease step-size
 options.test.change_step_size_n_trials = 15; % Change step-size every...
-options.test.initial_step_size  = 8;%2; % Semitones.
+options.test.initial_step_size  = 4;%2; % Semitones.
 options.test.starting_difference = 12; % Semitones
 options.test.down_up = [2, 1]; % 2-down, 1-up => 70.7%
 options.test.terminate_on_nturns = 8;
 options.test.terminate_on_ntrials = 150;
 options.test.retry = 1; % Number of retry if measure failed
 options.test.threshold_on_last_n_trials = 5;
+%for the training words at the beginning of each run.
+options.test.word_difference = 12; %Always have a 12 semitone difference between the reference and target words.
 
 options.training.n_repeat = 1;
 options.training.step_size_modifier = 1/sqrt(2);
@@ -51,6 +53,8 @@ options.training.terminate_on_nturns = 6;
 options.training.terminate_on_ntrials = 6;
 options.training.retry = 0; % Number of retry if measure failed
 options.training.threshold_on_last_n_trials = 5;
+
+
 
 %----------- Stimuli options
 options.test.f0s  = [242, 121, round(242*2^(5/12))]; % 242 = average pitch of original female voice
@@ -188,8 +192,8 @@ vi = 1; %vocoder index (how many vocoder instances u are simulating)
 vo = 1; %butterworth filter order fixed to 4th order.
 
 nc = 16; %run for 16 chs only
-elec_array = struct('type','AB-HiFocus','ins_depth',[],'tot_length',24.5,'e_width',0.4,'e_spacing',1.1,'nchs',16, 'active_length',15.5);
-c_length = 33; %33 mm average cochlear length
+elec_array = struct('type','AB-HiFocus','ins_depth',[],'tot_length',24.5,'e_width',0.4,'e_spacing',0.85,'nchs',16, 'active_length',15.5);
+c_length = 35; %33 mm average cochlear length
 
 range = [170 8700];
 tables = {'greenwood','lin','ci24','hr90k'};
@@ -201,13 +205,14 @@ for i = 1:length(ins_depth)
     elec_array.ins_depth = ins_depth(i);
     x = e_loc(elec_array,c_length);
     
-    bf_SG = spiral_ganglion(x);
+%     bf_SG = spiral_ganglion(x);
+    %bf_GW = GW(x);
     
     
     for i_freq_table = 1:length(tables) %loop on the type of frequency tables 
 
         p.analysis_filters  = estfilt_shift(nc, tables{i_freq_table}, options.fs, range, vo);
-        p.synthesis_filters = estfilt_shift(nc, 'SG', options.fs, bf_SG, vo);
+        p.synthesis_filters = estfilt_shift(nc, 'greenwood', options.fs, x, vo);
 
         options.vocoder(vi).label = sprintf('n-%dch-%dord-%gmm', nc, 4*vo, ins_depth(i));
         options.vocoder(vi).description = sprintf('Noise-band vocoder, type %s ,%i bands from %d to %d Hz, insertion depth %g mm, order %i, %i Hz envelope cutoff.',...

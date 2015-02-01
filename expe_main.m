@@ -107,12 +107,12 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     
     training = condition;
     
-    new_voice_st = difference*u;
+    new_voice_st = options.test.word_difference*u; %Always use a 12 semitone difference
     training.f0 = options.test.voices(training.ref_voice).f0 * [1, 2^(new_voice_st(1)/12)];
     training.ser = options.test.voices(training.ref_voice).ser * [1, 2^(new_voice_st(2)/12)];
 
-    ifc = randperm(size(options.f0_contours, 1)); %%% Why is it an 8-by-3 matrix, where all 3 are different?
-    training.f0_contours = options.f0_contours(ifc(1:3), :);
+%     ifc = randperm(size(options.f0_contours, 1)); %%% Why is it an 8-by-3 matrix, where all 3 are different?
+%     training.f0_contours = options.f0_contours(ifc(1:3), :);
     
     iword = randperm(length(options.words));
     for i_int=1:5

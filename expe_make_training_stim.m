@@ -19,7 +19,7 @@ for i=1:length(trial.words)
     for j=1:2
     
         
-        sf0 = f0(j)*2^(options.f0_contour_step_size*trial.f0_contours(j)/12);
+        sf0 = f0(j); %*2^(options.f0_contour_step_size*trial.f0_contours(j)/12);
         
         [y, fs] = straight_process(word{1}, sf0, ser(j), options);
 
