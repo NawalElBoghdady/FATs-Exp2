@@ -29,6 +29,8 @@ tables = {'greenwood','lin','ci24','hr90k'};
 
 ins_depth = [21.5, 18.5]; %shallow = 18.5mm, %deep insertion = 21.5mm for HiFocus => data from AB surgeon's guide for HiRes90K implant
 
+P1 = 20*10^(65/20);
+P1RMS = 0.1711;
 %Get all the CV filenames:
 CVs = dir('/Users/nawalelboghdady/Library/Matlab/Sounds/Dutch_CV/processed/*.wav');
 nCVs = length(CVs);
@@ -60,12 +62,12 @@ for i = 1:length(ins_depth)
             disp(strcat(num2str(cv),'/',num2str(nCVs)));
             [y,fs_y] = audioread(cv_list{cv});
             [y_voc,fs_yvoc] = vocode(y,fs_y,p);
-            
+            %y_voc = y_voc.*10^(-3/20);
             [y_voc_bands,~] = analyze_chs(y_voc,fs_yvoc,b);
             
             
             for n = 1:nc
-                yvoc_dbspl(n,cv) = dbspl(y_voc_bands(n,:));
+                yvoc_dbspl(n,cv) = P1.*(rms(y_voc_bands(n,:)))./P1RMS;
                 
             end
             

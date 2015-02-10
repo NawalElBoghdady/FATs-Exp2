@@ -235,6 +235,9 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             trial.syllables{i_int} = options.syllables(isyll(1:options.n_syll));
         end
         
+        %%%%%%%%%%%%%%
+        
+        %%%%%%%%%%%%%%
         
         % Prepare the stimulus
         if SIMUL>=2
