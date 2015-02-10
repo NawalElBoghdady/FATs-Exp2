@@ -23,7 +23,7 @@ options.fs = 44100;
 if test_machine
     options.attenuation_dB = 3; % General attenuation
 else
-    options.attenuation_dB = 27; % General attenuation
+    options.attenuation_dB = 3; % General attenuation
 end
 options.ear = 'both'; % right, left or both
 

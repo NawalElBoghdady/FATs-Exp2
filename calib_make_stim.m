@@ -125,7 +125,8 @@ if ~exist(wavOut, 'file') || options.force_rebuild_sylls
     if exist(mat, 'file')
         load(mat);
     else
-        [x, fs] = audioread(wavIn);
+        %[x, fs] = audioread(wavIn);
+        [x, fs] = wavread(wavIn);
         [f0, ap] = exstraightsource(x, fs);
         %old_f0 = f0;
         %f0(f0<80) = 0;
@@ -150,10 +151,10 @@ if ~exist(wavOut, 'file') || options.force_rebuild_sylls
         y = 0.98*y/max(abs(y));
     end
     
-    audiowrite(wavOut, y, fs);
+    wavwrite(y, fs, wavOut);
     
     rmpath(straight_path);
 else
-    [y, fs] = audioread(wavOut);
+    [y, fs] = wavread(wavOut);
 end
 

@@ -53,29 +53,32 @@ for i=1:length(trial.syllables)
         end
     end
     
-    if trial.vocoder>0
-        [x, fs] = vocode(x, fs, options.vocoder(trial.vocoder).parameters);
+    
+    if numel(x)>0
+    
+        if trial.vocoder>0
+            [x, fs] = vocode(x, fs, options.vocoder(trial.vocoder).parameters);
+        end
+
+        x = x(:);
+
+        % Apply a 1 ms ramp to avoid clicking
+        nrmp = floor(fs/1000);
+        x(1:nrmp) = x(1:nrmp) .* linspace(0,1,nrmp)';
+        x(end-nrmp+1:end) = x(end-nrmp+1:end) .* linspace(1,0,nrmp)';
+
+        switch options.ear
+            case 'right'
+                x  = [zeros(size(x)), x];
+            case 'left'
+                x = [x, zeros(size(x))];
+            case 'both'
+                x = repmat(x, 1, 2);
+            otherwise
+                error(sprintf('options.ear="%s" is not implemented', options.ear));
+        end
+
     end
-    
-    x = x(:);
-    
-    % Apply a 1 ms ramp to avoid clicking
-    nrmp = floor(fs/1000);
-    x(1:nrmp) = x(1:nrmp) .* linspace(0,1,nrmp)';
-    x(end-nrmp+1:end) = x(end-nrmp+1:end) .* linspace(1,0,nrmp)';
-    
-    switch options.ear
-        case 'right'
-            x  = [zeros(size(x)), x];
-        case 'left'
-            x = [x, zeros(size(x))];
-        case 'both'
-            x = repmat(x, 1, 2);
-        otherwise
-            error(sprintf('options.ear="%s" is not implemented', options.ear));
-    end
-    
-    
     
     xOut{i} = x;
 end
@@ -105,6 +108,14 @@ function [y, fs] = straight_process(syll, t_f0, ser, options)
 
 wavIn = fullfile(options.sound_path, [syll, '.wav']);
 wavOut = make_fname(wavIn, t_f0, ser, options.syllable_duration, options.tmp_path);
+
+if ~exist('audioread')
+    audioread = @wavread;
+end
+
+if ~exist('audiowrite')
+    audiowrite = @(fname, x, fs) wavwrite(x,fs,fname);
+end
 
 if ~exist(wavOut, 'file') || options.force_rebuild_sylls
     
@@ -143,12 +154,15 @@ if ~exist(wavOut, 'file') || options.force_rebuild_sylls
     if max(abs(y))>1
         warning('Output was renormalized for "%s".', wavOut);
         y = 0.98*y/max(abs(y));
-    end
+    end 
     
     audiowrite(wavOut, y, fs);
     
     rmpath(straight_path);
 else
+    
+    
+    
     [y, fs] = audioread(wavOut);
 end
 
