@@ -10,18 +10,17 @@ if nargin<1
     is_xls = false;
 end
 
-%addpath('./mksqlite');
-addpath('/Users/nawalelboghdady/Library/Matlab/mksqlite-1.14');
-
 disp('Calling "expe_to_sql()"...');
 db_filename = expe_to_sql();
+
+addpath('~/Library/Matlab/mksqlite');
 db = mksqlite('open', db_filename);
 
 if is_xls
     csv_file = strrep(db_filename, '_db.sqlite', '.xls');
 end
 
-for t = {'thr', 'summary'}
+for t = {'thr'} %, 'summary'}
     
     if ~is_xls
         csv_file = strrep(db_filename, '_db.sqlite', ['_', t{1}, '.csv']);
@@ -85,4 +84,4 @@ end
 
 mksqlite(db, 'close');
 
-rmpath('./mksqlite');
+rmpath('~/Library/Matlab/mksqlite');

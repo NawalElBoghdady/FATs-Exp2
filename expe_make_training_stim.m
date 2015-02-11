@@ -28,6 +28,7 @@ for i=1:length(trial.words)
             fs = options.fs;
         end
         
+        %{
         dl = round(options.word_duration*fs) - length(y);
         if dl>0
             npad_L = floor(dl/20);
@@ -46,7 +47,10 @@ for i=1:length(trial.words)
             nr = floor(1e-3*fs);
             y(1:nr) = y(1:nr)' .* linspace(0, 1, nr)';
             y(end-nr+1:end) = y(end-nr+1:end)' .* linspace(1, 0, nr)';
-        end 
+        end
+        %}
+        
+        
 
         x_unvoc{j,i} = y;
         
@@ -79,15 +83,13 @@ end
 
 
 %--------------------------------------------------------------------------
-function fname = make_fname(wav, f0, ser, d, destPath)
+function fname = make_fname(wav, f0, ser, destPath)
 
 [~, name, ext] = fileparts(wav);
 
-if isnan(d)
-    fname = sprintf('%s_GPR%d_SER%.2f', name, floor(f0), ser);
-else
-    fname = sprintf('%s_GPR%d_SER%.2f_D%d', name, floor(f0), ser, floor(d*1e3));
-end
+
+fname = sprintf('%s_GPR%d_SER%.2f', name, floor(f0), ser);
+
 fname = fullfile(destPath, [fname, ext]);
     
 
@@ -95,7 +97,8 @@ fname = fullfile(destPath, [fname, ext]);
 function [y, fs] = straight_process(syll, t_f0, ser, options)
 
 wavIn = fullfile(options.training_words, [syll, '.wav']);
-wavOut = make_fname(wavIn, t_f0, ser, options.word_duration, options.training_words_tmp);
+wavOut = make_fname(wavIn, t_f0, ser, options.training_words_tmp);
+
 
 if ~exist(wavOut, 'file') || options.force_rebuild_sylls
     
@@ -111,7 +114,8 @@ if ~exist(wavOut, 'file') || options.force_rebuild_sylls
     if exist(mat, 'file')
         load(mat);
     else
-        [x, fs] = audioread(wavIn);
+        [x, fs] = wavread(wavIn);
+        x = remove_silence(x(:,1), fs);
         [f0, ap] = exstraightsource(x, fs);
         %old_f0 = f0;
         %f0(f0<80) = 0;
@@ -136,10 +140,10 @@ if ~exist(wavOut, 'file') || options.force_rebuild_sylls
         y = 0.98*y/max(abs(y));
     end
     
-    audiowrite(wavOut, y, fs);
+    wavwrite(y, fs, wavOut);
     
     rmpath(straight_path);
 else
-    [y, fs] = audioread(wavOut);
+    [y, fs] = wavread(wavOut);
 end
 

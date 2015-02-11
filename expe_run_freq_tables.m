@@ -19,12 +19,12 @@ options.subject_name  = subject;
 current_dir = fileparts(mfilename('fullpath'));
 added_path  = {};
 
-added_path{end+1} = '~/Library/Matlab/auditory-research-tools/vocoder_2013';
+added_path{end+1} = '~/Library/Matlab/vocoder_2015';
 addpath(added_path{end});
 
 %Added by Nawal
-added_path{end+1} = '~/Library/Matlab/STRAIGHTV40_006b';
-addpath(added_path{end});
+%added_path{end+1} = '~/Library/Matlab/STRAIGHTV40_006b';
+%addpath(added_path{end});
 
 %-------------------------------------------------
 

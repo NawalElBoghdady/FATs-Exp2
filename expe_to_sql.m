@@ -1,6 +1,6 @@
 function db_filename = expe_to_sql()
 
-addpath('/Users/nawalelboghdady/Library/Matlab/mksqlite-1.14');
+addpath('~/Library/Matlab/mksqlite');
 
 options = expe_options();
 
@@ -118,6 +118,8 @@ end
 mksqlite(db, 'close');
 
 %rmpath('./mksqlite');
+
+rmpath('~/Library/Matlab/mksqlite');
 
 %==========================================================================
 function md = md5(msg)

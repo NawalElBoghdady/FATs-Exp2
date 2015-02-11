@@ -38,7 +38,7 @@ options.test.down_up = [2, 1]; % 2-down, 1-up => 70.7%
 options.test.terminate_on_nturns = 8;
 options.test.terminate_on_ntrials = 150;
 options.test.retry = 1; % Number of retry if measure failed
-options.test.threshold_on_last_n_trials = 5;
+options.test.threshold_on_last_n_trials = 6;
 %for the training words at the beginning of each run.
 options.test.word_difference = 12; %Always have a 12 semitone difference between the reference and target words.
 
@@ -52,7 +52,7 @@ options.training.down_up = [2, 1]; % 2-down, 1-up => 70.7%
 options.training.terminate_on_nturns = 6;
 options.training.terminate_on_ntrials = 6;
 options.training.retry = 0; % Number of retry if measure failed
-options.training.threshold_on_last_n_trials = 5;
+options.training.threshold_on_last_n_trials = 6;
 
 
 
@@ -103,11 +103,20 @@ options.training.voice_pairs = [...
     1 5;  % Female -> Male VTL
     1 7]; % Female -> Child VTL
 
-if ~test_machine %If it's computer in Stille Kamer
-    options.sound_path = '~/projects/00 stimuli/Dutch_CV/equalized';
-    options.tmp_path   = '~/projects/00 stimuli/Dutch_CV/processed';
-    options.training_words = '~/projects/00 stimuli/NVA/equalized';
-    options.training_words_tmp   = '~/projects/00 stimuli/NVA/processed';
+% if ~test_machine %If it's computer in Stille Kamer
+%     options.sound_path = '~/projects/00 stimuli/Dutch_CV/equalized';
+%     options.tmp_path   = '~/projects/00 stimuli/Dutch_CV/processed';
+%     options.training_words = '~/projects/00 stimuli/NVA/equalized';
+%     options.training_words_tmp   = '~/projects/00 stimuli/NVA/processed';
+
+if test_machine %If it's computer in Tinnitus Room
+    disp('-------------------------');
+    disp('--- In Tinnitus Room ---');
+    disp('-------------------------');
+    options.sound_path = '/Users/denizbaskent/Sounds/Dutch_CV/equalized';
+    options.tmp_path   = '/Users/denizbaskent/Sounds/Dutch_CV/processed';
+    options.training_words = '/Users/denizbaskent/Sounds/NVA/equalized';
+    options.training_words_tmp   = '/Users/denizbaskent/Sounds/NVA/processed';
     
 else %If it's experimenter's OWN computer:
     disp('-------------------------');
@@ -134,9 +143,14 @@ for i= 1:length(syllable_list)
 end
 
 dir_words = dir([options.training_words, '/*.wav']);
-word_list = {dir_words.name};
-for i= 1:length(word_list)
-    word_list{i} = strrep(word_list{i}, '.wav', '');
+word_list = {};
+for i = 1:length(dir_words)
+    switch dir_words(i).name
+        case '00 Spraakruis.wav'
+            continue
+        otherwise
+            word_list{end+1} = strrep(dir_words(i).name, '.wav', '');
+    end
 end
 
 options.syllables = syllable_list;
@@ -178,7 +192,7 @@ p.synth.f0 = 1;
 
 p.envelope.fc = 300;
 
-p.random_seed = 1;
+%p.random_seed = 1;
 
 %--
 

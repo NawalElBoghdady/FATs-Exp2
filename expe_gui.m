@@ -13,6 +13,7 @@ fntsz = 40;
 
 scrsz = get(0,'ScreenSize');
 
+
 test_machine = is_test_machine();
 if ~test_machine
     left=scrsz(1); bottom=scrsz(2); width=scrsz(3); height=scrsz(4);
@@ -21,7 +22,10 @@ else
 end
 scrsz = [left, bottom, width, height];
 
-h.background_color = [.4 .4 .4];
+% scrsz = get(0, 'MonitorPositions');
+% scrsz = scrsz(2,:);
+
+h.background_color = [.6 .6 .6];
 h.button_face_color = [0 0 .07]+.8;
 h.button_border_color = h.button_face_color*.6;
 h.button_press_color = .5*h.button_face_color+.5;
@@ -50,11 +54,14 @@ h.grid = axes('Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid
 h.instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+10, grid_sz(1), 50], ...
     'HorizontalAlignment', 'center', 'FontSize', fntsz, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
 
-h.training_instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+10, grid_sz(1), 50], ...
+h.training_instruction = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+10, grid_sz(1), 70], ...
     'HorizontalAlignment', 'center', 'FontSize', 25, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
 
-h.training_word = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2, grid_sz(1), 50], ...
-    'HorizontalAlignment', 'center', 'FontSize', 25, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
+h.training_word = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2, grid_sz(1), 140], ...
+     'HorizontalAlignment', 'center', 'FontSize', 50, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
+
+%h.training_word = uicontrol('Style', 'text', 'Units', 'pixel', 'Position', [width/2-grid_sz(1)/2, height/2-grid_sz(2)/2+grid_sz(2)+13, grid_sz(1), 50], ...
+ %   'HorizontalAlignment', 'center', 'FontSize', 25, 'ForegroundColor', h.main_text_color, 'BackgroundColor', h.background_color);
 
 % Margin
 m = .1;

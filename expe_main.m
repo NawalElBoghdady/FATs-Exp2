@@ -43,6 +43,8 @@ opt = char(questdlg2(sprintf('Ready to start?'),h,'Go','Cancel','Go'));
 
 beginning_of_session = now();
 
+rng('shuffle');
+
 %=============================================================== MAIN LOOP
 
 while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are some conditions to do
@@ -132,8 +134,8 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
         player{2,i} = audioplayer([zeros(1024*3, 2); x; zeros(1024*3, 2)], fs, 16);
     end
 
-    ibi = audioplayer(zeros(floor(.1*fs), 2), fs); %interblock interval
-    iwi = audioplayer(zeros(floor(.05*fs), 2), fs); %interword interval
+    ibi = audioplayer(zeros(floor(.05*fs), 2), fs); %interblock interval
+    iwi = audioplayer(zeros(floor(.025*fs), 2), fs); %interword interval
 
     pause(.5);
 
@@ -143,13 +145,16 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
         %h.highlight_button(i, 'on');
         disp(training.words{i});
         disp('=====');
-        h.set_training_word(['REFERENCE:';training.words{i}]);
+        h.set_training_word(['reference:';upper(training.words{i})]);
+        h.set_training_word_color([0 0 0.8]);
         h.show_training_word();
-        h.set_training_word_color([0.2 0.2 1]);
+        drawnow();
+        pause(.5);
         playblocking(player{1,i});
         playblocking(iwi);
-        h.set_training_word(['TARGET:';training.words{i}]);
-        h.set_training_word_color([1 0.2 0.2]);
+        h.set_training_word(['target:';upper(training.words{i})]);
+        h.set_training_word_color([0.8 0 0]);
+        drawnow();
         playblocking(player{2,i});
         h.hide_training_word();
         %h.highlight_button(i, 'off');
@@ -234,6 +239,8 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             %trial.syllables{i_int} = options.syllables(isyll(((i_int-1)*options.n_syll+(1:options.n_syll))));
             trial.syllables{i_int} = options.syllables(isyll(1:options.n_syll));
         end
+        
+        options.syllables(isyll(1:options.n_syll))
         
         %%%%%%%%%%%%%%
         

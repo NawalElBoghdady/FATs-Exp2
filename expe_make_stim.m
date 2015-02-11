@@ -32,16 +32,16 @@ for i=1:length(trial.syllables)
         if dl>0
             npad_L = floor(dl/20);
             npad_R = dl-npad_L;
-            nr = floor(1e-3*fs);
+            nr = floor(5e-3*fs);
             y(1:nr) = y(1:nr) .* linspace(0, 1, nr)';
             y(end-nr+1:end) = y(end-nr+1:end) .* linspace(1, 0, nr)';
             y = [zeros(npad_L,1); y; zeros(npad_R,1)];
         elseif dl<0
             y = y(1:end-dl);
-            nr = floor(1e-3*fs); % 1 ms linear ramp at the end
+            nr = floor(5e-3*fs); % 1 ms linear ramp at the end
             y(end-nr+1:end) = y(end-nr+1:end) .* linspace(1, 0, nr)';
         else
-            nr = floor(1e-3*fs);
+            nr = floor(5e-3*fs);
             y(1:nr) = y(1:nr) .* linspace(0, 1, nr)';
             y(end-nr+1:end) = y(end-nr+1:end) .* linspace(1, 0, nr)';
         end 
@@ -83,8 +83,6 @@ for i=1:length(trial.syllables)
     xOut{i} = x;
 end
 
-rng('shuffle');
-
 i_order = randperm(length(xOut));
 xOut = xOut(i_order);
 
@@ -120,7 +118,7 @@ end
 if ~exist(wavOut, 'file') || options.force_rebuild_sylls
     
     if ~is_test_machine()
-        straight_path = '../lib/STRAIGHTV40_006b';
+        straight_path = '~/Library/Matlab/STRAIGHTV40_006b';
     else
         straight_path = '~/Library/Matlab/STRAIGHTV40_006b';
     end
