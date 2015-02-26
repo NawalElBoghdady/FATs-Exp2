@@ -1,1 +1,1 @@
-nanu-test5 : test : 3/32
+Nawal-test-clicking : test : 2/32

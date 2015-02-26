@@ -60,9 +60,13 @@ for i=1:length(trial.words)
         end
         
         % Apply a 1 ms ramp to avoid clicking
-        nrmp = floor(fs/1000);
-        y(1:nrmp) = y(1:nrmp) .* linspace(0,1,nrmp)';
-        y(end-nrmp+1:end) = y(end-nrmp+1:end) .* linspace(1,0,nrmp)';
+%         nrmp = floor(fs/1000);
+%         y(1:nrmp) = y(1:nrmp) .* linspace(0,1,nrmp)';
+%         y(end-nrmp+1:end) = y(end-nrmp+1:end) .* linspace(1,0,nrmp)';
+
+        %This prevents the wavwrite from clipping the data; works better than snippet above:
+        m = max(abs(min(y)),max(y)) + 0.001;
+        y = y./m;
 
         switch options.ear
             case 'right'

@@ -1,4 +1,4 @@
-function [xOut, fs, i_correct] = expe_make_stim(options, trial)
+ function [xOut, fs, i_correct] = expe_make_stim(options, trial)
 
 %--------------------------------------------------------------------------
 % Etienne Gaudrain <etienne.gaudrain@mrc-cbu.cam.ac.uk>
@@ -63,9 +63,15 @@ for i=1:length(trial.syllables)
         x = x(:);
 
         % Apply a 1 ms ramp to avoid clicking
-        nrmp = floor(fs/1000);
-        x(1:nrmp) = x(1:nrmp) .* linspace(0,1,nrmp)';
-        x(end-nrmp+1:end) = x(end-nrmp+1:end) .* linspace(1,0,nrmp)';
+%         nrmp = floor(fs/1000);
+%         x(1:nrmp) = x(1:nrmp) .* linspace(0,1,nrmp)';
+%         x(end-nrmp+1:end) = x(end-nrmp+1:end) .* linspace(1,0,nrmp)';
+        
+        
+        %This prevents the wavwrite from clipping the data; works better
+        %than snippet above:
+        m = max(abs(min(x)),max(x)) + 0.001;
+        x = x./m;
 
         switch options.ear
             case 'right'

@@ -213,6 +213,8 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
     h.set_instruction(sprintf('Which interval is different?'));
     h.set_progress(strrep(phase, '_', ' '), sum([expe.( phase ).conditions.done])+1, length([expe.( phase ).conditions.done]));
     
+    
+    
     while true
         
         tstart = tic; %find out how long each trial lasts
@@ -242,15 +244,14 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
         
         options.syllables(isyll(1:options.n_syll))
         
-        %%%%%%%%%%%%%%
-        
-        %%%%%%%%%%%%%%
         
         % Prepare the stimulus
         if SIMUL>=2
             i_correct = 1;
         else
             [xOut, fs, i_correct] = expe_make_stim(options, trial);
+            
+            
             player = {};
             for i=1:length(xOut)
                 x = xOut{i}*10^(-options.attenuation_dB/20);
@@ -483,6 +484,7 @@ while mean([expe.( phase ).conditions.done])~=1 % Keep going while there are som
             hold off
         end
         
+       
     end
     
     time = toc(tstart);
