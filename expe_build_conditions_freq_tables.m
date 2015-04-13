@@ -42,7 +42,7 @@ options.test.threshold_on_last_n_trials = 6;
 %for the training words at the beginning of each run.
 options.test.word_difference = 12; %Always have a 12 semitone difference between the reference and target words.
 
-options.training.n_repeat = 1;
+options.training.n_repeat = 2; %1;
 options.training.step_size_modifier = 1/sqrt(2);
 options.training.change_step_size_condition = 2; % When difference <= this, decrease step-size
 options.training.change_step_size_n_trials = 15; % Change step-size every...

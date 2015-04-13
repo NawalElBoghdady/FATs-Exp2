@@ -32,7 +32,7 @@ for j = 1:n_conditions
 
     files = dir(strcat(options.tmp_path,'/*.wav'));
 
-    for i = 1:100
+    for i = 1:5
 
         file = files(i).name;
         disp(file);
@@ -56,8 +56,8 @@ for j = 1:n_conditions
 %         x(end-nrmp+1:end) = x(end-nrmp+1:end) .* linspace(1,0,nrmp)';
 
         %normalize x to avoid clipping
-        m = max(abs(min(x)),max(x)) + 0.001;
-        x = x./m;
+         m = max(abs(min(x)),max(x)) + 0.001;
+         x = x./m;
 
         switch options.ear
             case 'right'
